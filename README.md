@@ -171,8 +171,8 @@ docker run -p 8700:8500 --mount type=bind,source=/home/Review-based-Collaborativ
 ```
 
 最后编写客户端代码，发送模型的输入数据至`Tensorflow_Serving`的指定模型，得出预测结果：
-```
-'''python
+```python
+'''
     客户端连接`Tensorflow_Serving`，使用指定模型进行预测的代码
 '''
 
@@ -244,5 +244,50 @@ result.outputs['tensor_info_pre_y'].float_val
 
 ```
 
+## 4. Tensorflow_Serving部署多个模型
+上文仅仅是部署了单个模型，假设现在我们共训练了3个模型，它们的保存路径为：
+- trained_models
+    - MMModel
+        - 1
+    - MMModel_2
+        - 1
+    - MMModel_3
+        - 1
+
+只需要新增一个`Tensorflow_Serving`的配置文件`models.config`：
+```ruby
+# models.config:
+model_config_list:{
+    config:{
+      name:"MMModel",
+      base_path:"/models/trained_models/MMModel",
+      model_platform:"tensorflow"
+    },
+    config:{
+      name:"MMModel_2",
+      base_path:"/models/trained_models/MMModel_2",
+      model_platform:"tensorflow"
+    }
+    config:{
+      name:"MMModel_3",
+      base_path:"/models/trained_models/MMModel_3",
+      model_platform:"tensorflow"
+    }
+}
+```
+启动的docker指令更改为：
+```ruby
+'''
+    注意，配置文件`models.config`的base_path是docker指令启动Tensorflow_Serving时所指定的target路径。
+'''
+docker run -p 8700:8500 --mount type=bind,source=保存模型的目录trained_models的绝对路径,target=/models/trained_models -t tensorflow/serving --model_config_file=配置文件models.config的绝对路径
+
+'''
+    在项目代码中，我已经将编写好的`models.config`存放到文件夹`trained_models`中了，启动docker时填写对应的路径即可。
+'''
+```
+
+==对应的客户端请求代码已写入项目代码中的jupyter文件`Request several models with tf_serving API.ipynb`==
 
 
+## 5. 整体的项目代码： [GitHub传送门](https://github.com/540117253/Tensorflow_Serving-Demo)

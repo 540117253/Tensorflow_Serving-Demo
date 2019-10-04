@@ -172,7 +172,7 @@ docker run -p 8700:8500 --mount type=bind,source=/home/Review-based-Collaborativ
 
 最后编写客户端代码，发送模型的输入数据至`Tensorflow_Serving`的指定模型，得出预测结果：
 ```
-'''
+'''python
     客户端连接`Tensorflow_Serving`，使用指定模型进行预测的代码
 '''
 
